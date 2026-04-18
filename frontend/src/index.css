@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-white text-apple-text font-sans;
+    overscroll-behavior: none;
+  }
+
+  /* Hide scrollbar but keep scroll behaviour */
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+}
+
+@layer components {
+  /* Frosted glass surface — used for nav bar and modal sheets */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+
+  /* Apple-style section label */
+  .label {
+    @apply text-xs font-semibold tracking-widest uppercase text-apple-sub;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
