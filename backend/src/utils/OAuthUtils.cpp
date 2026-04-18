@@ -56,7 +56,7 @@ void OAuthUtils::getUserInfo(const std::string& code,
 
             Json::Value json;
             Json::Reader reader;
-            if (!reader.parse(resp->body(), json)) {
+            if (!reader.parse(std::string(resp->body()), json)) {
                 LOG_WARN << "Failed to parse Google token response";
                 cb(std::nullopt);
                 return;
