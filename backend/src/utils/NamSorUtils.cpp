@@ -55,7 +55,7 @@ void NamSorUtils::inferGender(const std::string& fullName,
 
             Json::Value json;
             Json::Reader reader;
-            if (!reader.parse(resp->body(), json) ||
+            if (!reader.parse(std::string(resp->body()), json) ||
                 !json.isMember("personalNames") ||
                 json["personalNames"].empty()) {
                 LOG_WARN << "NamSor genderBatch: unexpected response body";
@@ -94,7 +94,7 @@ void NamSorUtils::inferEthnicity(const std::string& fullName,
 
             Json::Value json;
             Json::Reader reader;
-            if (!reader.parse(resp->body(), json) ||
+            if (!reader.parse(std::string(resp->body()), json) ||
                 !json.isMember("personalNames") ||
                 json["personalNames"].empty()) {
                 LOG_WARN << "NamSor usRaceEthnicityBatch: unexpected response body";
