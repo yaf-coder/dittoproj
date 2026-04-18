@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "utils/JwtUtils.h"
 #include "utils/NamSorUtils.h"
+// #include "utils/OAuthUtils.h"  // Google OAuth — uncomment to re-enable
 
 // Run schema migrations against the SQLite file before Drogon opens its
 // own connection pool. Uses the raw C API so we can enable WAL mode and
@@ -49,6 +50,11 @@ int main() {
 
     JwtUtils::init(cfg["jwt_secret"].asString());
     NamSorUtils::init(cfg["namsor_api_key"].asString());
+    // OAuthUtils::init(                                 // Google OAuth — uncomment to re-enable
+    //     cfg["google_client_id"].asString(),
+    //     cfg["google_client_secret"].asString(),
+    //     cfg["google_redirect_uri"].asString()
+    // );
 
     runMigrations(cfg["db_path"].asString());
 

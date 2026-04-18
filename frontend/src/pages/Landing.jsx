@@ -15,20 +15,20 @@ const fadeUp = (delay = 0) => ({
 export default function Landing() {
   const { login }   = useAuth()
   const navigate    = useNavigate()
-  const [name, setName]         = useState('')
+  const [phone, setPhone]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!name.trim())     { setError('First name is required.'); return }
-    if (!password.trim()) { setError('Password is required.');   return }
+    if (!phone.trim())    { setError('Phone number is required.'); return }
+    if (!password.trim()) { setError('Password is required.');     return }
 
     setLoading(true)
     setError('')
     try {
-      const { token } = await api.login({ name: name.trim(), password })
+      const { token } = await api.login({ phone_number: phone.trim(), password })
       login(token)
       navigate('/onboarding', { replace: true })
     } catch {
@@ -73,12 +73,12 @@ export default function Landing() {
           className="w-full max-w-sm flex flex-col gap-3 text-left"
         >
           <Input
-            label="First name"
-            placeholder="John"
-            type="text"
-            autoComplete="given-name"
-            value={name}
-            onChange={e => { setError(''); setName(e.target.value) }}
+            label="Phone number"
+            placeholder="+1 (555) 000-0000"
+            type="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={e => { setError(''); setPhone(e.target.value) }}
           />
           <Input
             label="Password"

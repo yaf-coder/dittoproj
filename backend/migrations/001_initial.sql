@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-    name               TEXT    NOT NULL UNIQUE,
+    name               TEXT,
     email              TEXT    UNIQUE,
 
     -- Collected from user
     age                INTEGER CHECK(age IS NULL OR (age >= 18 AND age <= 120)),
     location           TEXT,
-    phone_number       TEXT,
+    phone_number       TEXT    UNIQUE,
 
     -- Projected by enrichment pipeline
     projected_gender   TEXT,
