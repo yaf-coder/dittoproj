@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 
 find_package(Drogon REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
