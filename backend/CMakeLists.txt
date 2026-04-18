@@ -34,4 +34,5 @@ target_link_libraries(ditto_backend PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
     jwt-cpp::jwt-cpp
+    SQLite::SQLite3
 )
