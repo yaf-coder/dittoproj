@@ -1,0 +1,5 @@
+config.json
+ditto.db
+ditto.db-wal
+ditto.db-shm
+build/

@@ -1,0 +1,29 @@
+{
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 8080
+    }
+  ],
+  "db_clients": [
+    {
+      "rdbms": "sqlite3",
+      "filename": "./ditto.db",
+      "name": "default",
+      "connection_number": 1
+    }
+  ],
+  "app": {
+    "threads_num": 0,
+    "log_level": "WARN",
+    "enable_session": false,
+    "custom_config": {
+      "db_path": "./ditto.db",
+      "google_client_id": "YOUR_GOOGLE_CLIENT_ID",
+      "google_client_secret": "YOUR_GOOGLE_CLIENT_SECRET",
+      "google_redirect_uri": "http://localhost:8080/auth/google/callback",
+      "jwt_secret": "replace-with-a-long-random-secret-at-least-32-chars",
+      "frontend_url": "http://localhost:5173"
+    }
+  }
+}
