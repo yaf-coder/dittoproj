@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "utils/JwtUtils.h"
 #include "utils/OAuthUtils.h"
+#include "utils/NamSorUtils.h"
 
 // Run schema migrations against the SQLite file before Drogon opens its
 // own connection pool. Uses the raw C API so we can enable WAL mode and
@@ -53,6 +54,8 @@ int main() {
         cfg["google_client_secret"].asString(),
         cfg["google_redirect_uri"].asString()
     );
+
+    NamSorUtils::init(cfg["namsor_api_key"].asString());
 
     runMigrations(cfg["db_path"].asString());
 
