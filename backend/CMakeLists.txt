@@ -8,21 +8,17 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 find_package(Drogon REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-# Prefer system-installed nlohmann_json (brew install nlohmann-json) so
-# jwt-cpp doesn't try to fetch its own copy (which bundles an old CMakeLists).
-find_package(nlohmann_json QUIET)
-
 include(FetchContent)
 FetchContent_Declare(
     jwt-cpp
     GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
     GIT_TAG        v0.7.0
 )
-set(JWT_BUILD_EXAMPLES       OFF CACHE BOOL "" FORCE)
-set(JWT_BUILD_TESTS          OFF CACHE BOOL "" FORCE)
-# Tell jwt-cpp to use the system nlohmann_json rather than fetching its own.
-set(JWT_EXTERNAL_PICOJSON    ON  CACHE BOOL "" FORCE)
-set(JWT_DISABLE_PICOJSON     ON  CACHE BOOL "" FORCE)
+set(JWT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(JWT_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+# Use jwt-cpp's bundled picojson — avoids any nlohmann_json fetch.
+set(JWT_DISABLE_PICOJSON     OFF CACHE BOOL "" FORCE)
+set(JWT_EXTERNAL_PICOJSON    OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(jwt-cpp)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
