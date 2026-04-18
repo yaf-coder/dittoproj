@@ -1,31 +1,24 @@
--- Fields explicitly collected from the user: name, age, location, phone_number.
--- All other attributes (gender, ethnicity, education, political belief) are projected
--- by the enrichment pipeline and never asked of the user.
-
 CREATE TABLE IF NOT EXISTS users (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-    google_id          TEXT    UNIQUE NOT NULL,
-    email              TEXT    UNIQUE NOT NULL,
+    name               TEXT    NOT NULL UNIQUE,
+    email              TEXT    UNIQUE,
 
     -- Collected from user
-    name               TEXT    NOT NULL,
     age                INTEGER CHECK(age IS NULL OR (age >= 18 AND age <= 120)),
-    location           TEXT,                          -- free-text city/region, e.g. "Austin, TX"
+    location           TEXT,
     phone_number       TEXT,
 
-    -- Projected by enrichment pipeline (never user-supplied)
-    projected_gender   TEXT,                          -- "male" | "female" | "unknown"
-    projected_ethnicity TEXT,                         -- NamSor raceEthnicity code, e.g. "W_NL", "HL", "A", "B_NL"
-    education_level    TEXT,                          -- "high_school" | "some_college" | "bachelors" | "masters" | "phd"
-    political_belief   REAL,                          -- 0.0 = far left, 1.0 = far right (formula TBD)
+    -- Projected by enrichment pipeline
+    projected_gender   TEXT,
+    projected_ethnicity TEXT,
+    education_level    TEXT,
+    political_belief   REAL,
 
     -- Enrichment lifecycle
-    enrichment_status  TEXT    NOT NULL DEFAULT 'pending',  -- "pending" | "done" | "failed"
+    enrichment_status  TEXT    NOT NULL DEFAULT 'pending',
     enriched_at        INTEGER,
 
-    -- OAuth picture (from Google, display only)
     picture            TEXT,
-
     created_at         INTEGER NOT NULL DEFAULT (unixepoch()),
     updated_at         INTEGER NOT NULL DEFAULT (unixepoch())
 );

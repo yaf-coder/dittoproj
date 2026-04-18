@@ -4,7 +4,6 @@
 #include <sstream>
 #include <stdexcept>
 #include "utils/JwtUtils.h"
-#include "utils/OAuthUtils.h"
 #include "utils/NamSorUtils.h"
 
 // Run schema migrations against the SQLite file before Drogon opens its
@@ -49,12 +48,6 @@ int main() {
     const auto& cfg = drogon::app().getCustomConfig();
 
     JwtUtils::init(cfg["jwt_secret"].asString());
-    OAuthUtils::init(
-        cfg["google_client_id"].asString(),
-        cfg["google_client_secret"].asString(),
-        cfg["google_redirect_uri"].asString()
-    );
-
     NamSorUtils::init(cfg["namsor_api_key"].asString());
 
     runMigrations(cfg["db_path"].asString());

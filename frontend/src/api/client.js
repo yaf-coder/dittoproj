@@ -25,6 +25,7 @@ async function request(method, path, body) {
 
 export const api = {
   // Auth
+  login:          (data) => request('POST', '/api/auth/login', data),
   getMe:          ()     => request('GET',  '/api/auth/me'),
   // Profile
   updateProfile:  (data) => request('PUT',  '/api/profiles/me', data),
