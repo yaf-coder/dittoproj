@@ -1,12 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './store/AuthContext'
-import Landing      from './pages/Landing'
-import AuthCallback from './pages/AuthCallback'
-import Onboarding   from './pages/Onboarding'
-import Discover     from './pages/Discover'
-import Matches      from './pages/Matches'
-import Profile      from './pages/Profile'
-import NavBar       from './components/NavBar'
+import Landing    from './pages/Landing'
+import Login      from './pages/Login'
+import Register   from './pages/Register'
+import Onboarding from './pages/Onboarding'
+import Discover   from './pages/Discover'
+import Matches    from './pages/Matches'
+import Profile    from './pages/Profile'
+import NavBar     from './components/NavBar'
 
 function Protected({ children }) {
   const { user, loading } = useAuth()
@@ -23,8 +24,6 @@ function Splash() {
   )
 }
 
-const TABBED = ['/discover', '/matches', '/profile']
-
 export default function App() {
   const { user, loading } = useAuth()
 
@@ -33,15 +32,15 @@ export default function App() {
   return (
     <div className="max-w-md mx-auto h-dvh flex flex-col relative overflow-hidden">
       <Routes>
-        <Route path="/"               element={user ? <Navigate to="/discover" replace /> : <Landing />} />
-        <Route path="/auth/callback"  element={<AuthCallback />} />
-        <Route path="/onboarding"     element={<Protected><Onboarding /></Protected>} />
-        <Route path="/discover"       element={<Protected><Discover /></Protected>} />
-        <Route path="/matches"        element={<Protected><Matches /></Protected>} />
-        <Route path="/profile"        element={<Protected><Profile /></Protected>} />
+        <Route path="/"           element={user ? <Navigate to="/discover" replace /> : <Landing />} />
+        <Route path="/login"      element={user ? <Navigate to="/discover" replace /> : <Login />} />
+        <Route path="/register"   element={user ? <Navigate to="/discover" replace /> : <Register />} />
+        <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
+        <Route path="/discover"   element={<Protected><Discover /></Protected>} />
+        <Route path="/matches"    element={<Protected><Matches /></Protected>} />
+        <Route path="/profile"    element={<Protected><Profile /></Protected>} />
       </Routes>
 
-      {/* Bottom tab bar — only on tabbed routes */}
       {user && <NavBar />}
     </div>
   )

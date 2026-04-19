@@ -17,7 +17,9 @@ async function request(method, path, body) {
 
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(text || `HTTP ${res.status}`)
+    let message = `HTTP ${res.status}`
+    try { message = JSON.parse(text).error ?? message } catch {}
+    throw new Error(message)
   }
 
   return res.json()
@@ -25,9 +27,12 @@ async function request(method, path, body) {
 
 export const api = {
   // Auth
+  register:       (data) => request('POST', '/api/auth/register', data),
+  login:          (data) => request('POST', '/api/auth/login', data),
   getMe:          ()     => request('GET',  '/api/auth/me'),
   // Profile
   updateProfile:  (data) => request('PUT',  '/api/profiles/me', data),
+  enrichProfile:  (data) => request('PUT',  '/api/profiles/me/enrich', data),
   getProfile:     (id)   => request('GET',  `/api/profiles/${id}`),
   // Discover & matching
   discover:       ()     => request('GET',  '/api/discover'),

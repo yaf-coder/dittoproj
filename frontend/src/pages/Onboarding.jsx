@@ -8,28 +8,16 @@ import Input  from '../components/Input'
 
 const STEPS = [
   {
-    key:         'name',
-    title:       'What\'s your name?',
-    subtitle:    'This is how you\'ll appear to others.',
-    inputProps:  { placeholder: 'Full name', type: 'text', autoComplete: 'name' },
+    key:        'age',
+    title:      'How old are you?',
+    subtitle:   'You must be 18 or older.',
+    inputProps: { placeholder: 'Age', type: 'number', min: 18, max: 120 },
   },
   {
-    key:         'age',
-    title:       'How old are you?',
-    subtitle:    'You must be 18 or older.',
-    inputProps:  { placeholder: 'Age', type: 'number', min: 18, max: 120 },
-  },
-  {
-    key:         'location',
-    title:       'Where are you based?',
-    subtitle:    'City or region, e.g. "Austin, TX".',
-    inputProps:  { placeholder: 'Location', type: 'text' },
-  },
-  {
-    key:         'phone_number',
-    title:       'Your phone number',
-    subtitle:    'For account security. Never shown to others.',
-    inputProps:  { placeholder: '+1 (555) 000-0000', type: 'tel', autoComplete: 'tel' },
+    key:        'location',
+    title:      'Where are you based?',
+    subtitle:   'City or region, e.g. "Austin, TX".',
+    inputProps: { placeholder: 'Location', type: 'text' },
   },
 ]
 
@@ -40,10 +28,11 @@ const slide = {
 }
 
 export default function Onboarding() {
-  const { setUser } = useAuth()
-  const navigate    = useNavigate()
+  const { user, setUser } = useAuth()
+  const navigate = useNavigate()
+
   const [step, setStep]     = useState(0)
-  const [values, setValues] = useState({ name: '', age: '', location: '', phone_number: '' })
+  const [values, setValues] = useState({ age: '', location: '' })
   const [error, setError]   = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -57,7 +46,7 @@ export default function Onboarding() {
   }
 
   async function handleNext() {
-    if (!value.trim()) { setError('This field is required.'); return }
+    if (!value.toString().trim()) { setError('This field is required.'); return }
     if (current.key === 'age' && (Number(value) < 18 || Number(value) > 120)) {
       setError('Age must be between 18 and 120.')
       return
@@ -68,12 +57,11 @@ export default function Onboarding() {
     setSaving(true)
     try {
       await api.updateProfile({
-        name:         values.name.trim(),
+        name:         user?.name ?? '',
         age:          Number(values.age),
         location:     values.location.trim(),
-        phone_number: values.phone_number.trim(),
+        phone_number: user?.phone_number ?? '',
       })
-      // Refresh user object
       const me = await api.getMe()
       setUser(me)
       navigate('/discover', { replace: true })

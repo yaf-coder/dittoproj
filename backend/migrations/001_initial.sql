@@ -1,29 +1,26 @@
--- Fields explicitly collected from the user: name, age, location, phone_number.
--- Enrichment fields (gender, ethnicity, education_level, political_belief) are
--- optional and user-supplied via the "Enrich Your Profile" form.
-
 CREATE TABLE IF NOT EXISTS users (
-    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-    google_id          TEXT    UNIQUE NOT NULL,
-    email              TEXT    UNIQUE NOT NULL,
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- Credentials
+    phone_number   TEXT    UNIQUE NOT NULL,
+    password_hash  TEXT    NOT NULL,
 
     -- Collected from user
-    name               TEXT    NOT NULL,
-    age                INTEGER CHECK(age IS NULL OR (age >= 18 AND age <= 120)),
-    location           TEXT,                          -- free-text city/region, e.g. "Austin, TX"
-    phone_number       TEXT,
+    name           TEXT    NOT NULL,
+    age            INTEGER CHECK(age IS NULL OR (age >= 18 AND age <= 120)),
+    location       TEXT,
 
     -- Optional enrichment fields (user-supplied via profile form)
-    gender             TEXT,                          -- "male" | "female" | "non_binary" | "prefer_not_to_say"
-    ethnicity          TEXT,                          -- "white" | "black" | "hispanic" | "asian" | "native_american" | "pacific_islander" | "middle_eastern" | "other" | "prefer_not_to_say"
-    education_level    TEXT,                          -- "high_school" | "some_college" | "bachelors" | "masters" | "phd"
-    political_belief   REAL,                          -- 0.0 = very liberal, 1.0 = very conservative
+    gender           TEXT,   -- "male" | "female" | "non_binary" | "prefer_not_to_say"
+    ethnicity        TEXT,   -- "white" | "black" | "hispanic" | "asian" | "native_american" | "pacific_islander" | "middle_eastern" | "other" | "prefer_not_to_say"
+    education_level  TEXT,   -- "high_school" | "some_college" | "bachelors" | "masters" | "phd"
+    political_belief REAL,   -- 0.0 = very liberal, 1.0 = very conservative
 
-    -- OAuth picture (from Google, display only)
-    picture            TEXT,
+    -- Profile photo (user-uploaded)
+    picture        TEXT,
 
-    created_at         INTEGER NOT NULL DEFAULT (unixepoch()),
-    updated_at         INTEGER NOT NULL DEFAULT (unixepoch())
+    created_at     INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at     INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
 CREATE TABLE IF NOT EXISTS user_photos (

@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include "utils/JwtUtils.h"
-#include "utils/OAuthUtils.h"
 
 static void runMigration(sqlite3* db, const std::string& path) {
     std::ifstream file(path);
@@ -25,6 +24,11 @@ static void runMigration(sqlite3* db, const std::string& path) {
 }
 
 static void runMigrations(const std::string& dbPath) {
+    // Must configure threading before any sqlite3_open call, otherwise
+    // sqlite3_initialize() fires implicitly and locks in the default config,
+    // causing Drogon's later sqlite3_config(SQLITE_CONFIG_MULTITHREAD) to fail.
+    sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
+
     sqlite3* db = nullptr;
     if (sqlite3_open(dbPath.c_str(), &db) != SQLITE_OK) {
         std::string err = sqlite3_errmsg(db);
@@ -35,8 +39,6 @@ static void runMigrations(const std::string& dbPath) {
     sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
     sqlite3_exec(db, "PRAGMA foreign_keys=ON;",  nullptr, nullptr, nullptr);
 
-    // 001 already contains the final schema for fresh DBs.
-    // 002 is for upgrading existing DBs with the old projected_* columns.
     const std::vector<std::string> migrations = {
         "migrations/001_initial.sql",
     };
@@ -54,11 +56,6 @@ int main() {
     const auto& cfg = drogon::app().getCustomConfig();
 
     JwtUtils::init(cfg["jwt_secret"].asString());
-    OAuthUtils::init(
-        cfg["google_client_id"].asString(),
-        cfg["google_client_secret"].asString(),
-        cfg["google_redirect_uri"].asString()
-    );
 
     runMigrations(cfg["db_path"].asString());
 
