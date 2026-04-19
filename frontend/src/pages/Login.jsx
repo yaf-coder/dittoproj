@@ -31,7 +31,7 @@ export default function Login() {
         password:     form.password,
       })
       login(token)
-      navigate('/discover', { replace: true })
+      navigate('/questions', { replace: true })
     } catch (e) {
       setError(e.message)
     } finally {

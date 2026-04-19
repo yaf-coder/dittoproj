@@ -64,7 +64,7 @@ export default function Onboarding() {
       })
       const me = await api.getMe()
       setUser(me)
-      navigate('/discover', { replace: true })
+      navigate('/questions', { replace: true })
     } catch (e) {
       setError(e.message)
     } finally {

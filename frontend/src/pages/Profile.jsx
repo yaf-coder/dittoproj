@@ -1,36 +1,63 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/AuthContext'
 import Button from '../components/Button'
 
-const ETHNICITY_LABELS = {
-  W_NL:  'White (Non-Latino)',
-  HL:    'Hispanic / Latino',
-  A:     'Asian',
-  B_NL:  'Black (Non-Latino)',
-  AI_AN: 'Am. Indian / AK Native',
-  PI:    'Pacific Islander',
+const EDUCATION_LABELS = {
+  high_school:  'High School',
+  some_college: 'Some College',
+  bachelors:    "Bachelor's",
+  masters:      "Master's",
+  phd:          'PhD / Doctorate',
+}
+
+const GENDER_LABELS = {
+  male:             'Man',
+  female:           'Woman',
+  non_binary:       'Non-binary',
+  other:            'Other',
+  prefer_not_to_say: 'Prefer not to say',
+}
+
+const POLITICAL_LABELS = [
+  { max: 0.125,  label: 'Very Liberal' },
+  { max: 0.375,  label: 'Liberal' },
+  { max: 0.625,  label: 'Moderate' },
+  { max: 0.875,  label: 'Conservative' },
+  { max: 1.001,  label: 'Very Conservative' },
+]
+
+function politicalLabel(score) {
+  for (const { max, label } of POLITICAL_LABELS) {
+    if (score < max) return label
+  }
+  return 'Very Conservative'
 }
 
 function Row({ label, value }) {
-  if (!value && value !== 0) return null
+  if (value === null || value === undefined || value === '') return null
   return (
     <div className="flex items-center justify-between py-3.5 border-b border-apple-gray-2 last:border-0">
       <span className="text-[15px] text-apple-sub">{label}</span>
-      <span className="text-[15px] font-medium text-apple-text text-right max-w-[55%] truncate">{value}</span>
+      <span className="text-[15px] font-medium text-apple-text text-right max-w-[60%]">{value}</span>
     </div>
   )
 }
 
 function BeliefBar({ score }) {
   return (
-    <div className="mt-1">
-      <div className="flex justify-between text-[11px] text-apple-sub mb-1.5">
-        <span>Left</span>
-        <span>Right</span>
+    <div className="py-3.5 border-b border-apple-gray-2 last:border-0">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[15px] text-apple-sub">Political identity</span>
+        <span className="text-[15px] font-medium text-apple-text">{politicalLabel(score)}</span>
       </div>
-      <div className="h-2 bg-apple-gray-2 rounded-full overflow-hidden">
+      <div className="flex justify-between text-[11px] text-apple-sub/60 mb-1.5">
+        <span>Liberal</span>
+        <span>Conservative</span>
+      </div>
+      <div className="h-1.5 bg-apple-gray-2 rounded-full overflow-hidden">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-apple-red"
+          className="h-full rounded-full bg-apple-blue"
           initial={{ width: 0 }}
           animate={{ width: `${score * 100}%` }}
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -40,28 +67,19 @@ function BeliefBar({ score }) {
   )
 }
 
-function EnrichmentBadge({ status }) {
-  const styles = {
-    done:    'bg-apple-green/10 text-apple-green',
-    pending: 'bg-apple-blue/10  text-apple-blue',
-    failed:  'bg-apple-red/10   text-apple-red',
-  }
-  const labels = { done: 'Enriched', pending: 'Processing…', failed: 'Failed' }
-  return (
-    <span className={`text-[12px] font-semibold px-2.5 py-1 rounded-full ${styles[status] ?? styles.pending}`}>
-      {labels[status] ?? 'Pending'}
-    </span>
-  )
-}
-
 export default function Profile() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   if (!user) return null
+
+  const hasEnrichment = user.gender || user.education_level ||
+    user.study_location || user.political_belief != null
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
-      {/* Header */}
       <div className="safe-top" />
+
+      {/* Header */}
       <div className="px-6 pt-10 pb-6 flex flex-col items-center text-center">
         <div className="w-24 h-24 rounded-full overflow-hidden bg-apple-gray mb-4 shadow-apple-sm">
           {user.picture ? (
@@ -84,35 +102,46 @@ export default function Profile() {
       </div>
 
       <div className="px-4 pb-10 flex flex-col gap-4">
-        {/* Collected info */}
+        {/* Basic info */}
         <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
-          <Row label="Age"    value={user.age} />
-          <Row label="Email"  value={user.email} />
+          <Row label="Age"          value={user.age} />
+          <Row label="Phone"        value={user.phone_number} />
         </div>
 
-        {/* Projected attributes */}
+        {/* Enrichment */}
         <div>
           <div className="flex items-center justify-between px-2 mb-2">
-            <p className="label">Projected</p>
-            <EnrichmentBadge status={user.enrichment_status} />
+            <p className="text-[13px] font-semibold text-apple-sub uppercase tracking-wide">
+              About you
+            </p>
+            <button
+              onClick={() => navigate('/questions')}
+              className="text-[13px] text-apple-blue font-medium"
+            >
+              Edit
+            </button>
           </div>
-          <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
-            <Row label="Gender"    value={user.projected_gender
-              ? user.projected_gender.charAt(0).toUpperCase() + user.projected_gender.slice(1)
-              : null}
-            />
-            <Row label="Ethnicity" value={ETHNICITY_LABELS[user.projected_ethnicity] ?? user.projected_ethnicity} />
-            <Row label="Education" value={user.education_level?.replace(/_/g, ' ')} />
-            {user.political_belief != null && (
-              <div className="py-3.5">
-                <span className="text-[15px] text-apple-sub">Political lean</span>
-                <BeliefBar score={user.political_belief} />
-              </div>
-            )}
-          </div>
+
+          {hasEnrichment ? (
+            <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
+              <Row label="Gender"        value={GENDER_LABELS[user.gender]} />
+              <Row label="Education"     value={EDUCATION_LABELS[user.education_level]} />
+              <Row label="Studied at"    value={user.study_location} />
+              {user.political_belief != null && <BeliefBar score={user.political_belief} />}
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/questions')}
+              className="w-full bg-white rounded-3xl shadow-apple-sm px-5 py-4 flex items-center justify-between"
+            >
+              <span className="text-[15px] text-apple-sub">Add details about yourself</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="#C7C7CC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
         </div>
 
-        {/* Sign out */}
         <Button variant="secondary" fullWidth onClick={logout}>
           Sign out
         </Button>

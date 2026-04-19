@@ -175,7 +175,7 @@ void AuthController::getMe(const drogon::HttpRequestPtr& req,
 
     db->execSqlAsync(
         "SELECT id, phone_number, name, age, location,"
-        "       gender, ethnicity, education_level, political_belief,"
+        "       gender, ethnicity, education_level, study_location, political_belief,"
         "       picture, created_at"
         " FROM users WHERE id = ?",
         [cb](const drogon::orm::Result& r) {
@@ -199,6 +199,7 @@ void AuthController::getMe(const drogon::HttpRequestPtr& req,
             if (!row["gender"].isNull())           user["gender"]           = row["gender"].as<std::string>();
             if (!row["ethnicity"].isNull())        user["ethnicity"]        = row["ethnicity"].as<std::string>();
             if (!row["education_level"].isNull())  user["education_level"]  = row["education_level"].as<std::string>();
+            if (!row["study_location"].isNull())   user["study_location"]   = row["study_location"].as<std::string>();
             if (!row["political_belief"].isNull()) user["political_belief"] = row["political_belief"].as<float>();
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(user));
         },
