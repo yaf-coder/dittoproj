@@ -1,4 +1,5 @@
 #include "ProfileController.h"
+#include "utils/AgentUtils.h"
 #include <drogon/drogon.h>
 #include <json/json.h>
 #include <trantor/utils/Logger.h>
@@ -190,10 +191,11 @@ void ProfileController::enrichProfile(const drogon::HttpRequestPtr& req,
     auto cb = shared_cb(std::move(callback));
     auto db = drogon::app().getDbClient();
 
-    auto rcb = [cb](const drogon::orm::Result&) {
+    auto rcb = [cb, userId](const drogon::orm::Result&) {
         Json::Value resp;
         resp["success"] = true;
         (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
+        AgentUtils::triggerCompatibility(userId);
     };
     auto ecb = [cb](const drogon::orm::DrogonDbException& e) {
         LOG_ERROR << "DB error in enrichProfile: " << e.base().what();

@@ -1,4 +1,5 @@
 #include "QuestionController.h"
+#include "utils/AgentUtils.h"
 #include <drogon/drogon.h>
 #include <json/json.h>
 #include <trantor/utils/Logger.h>
@@ -110,10 +111,11 @@ void QuestionController::answer(const drogon::HttpRequestPtr& req,
 
     db->execSqlAsync(
         "INSERT INTO user_responses (user_id, question_id, answer) VALUES (?, ?, ?)",
-        [cb](const drogon::orm::Result&) {
+        [cb, userId](const drogon::orm::Result&) {
             Json::Value resp;
             resp["success"] = true;
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
+            AgentUtils::triggerCompatibility(userId);
         },
         [cb](const drogon::orm::DrogonDbException& e) {
             LOG_ERROR << "DB error in answer: " << e.base().what();

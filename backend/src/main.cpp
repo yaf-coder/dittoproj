@@ -42,6 +42,7 @@ static void runMigrations(const std::string& dbPath) {
     const std::vector<std::string> migrations = {
         "migrations/001_initial.sql",
         "migrations/005_user_responses.sql",
+        "migrations/006_compatibility_scores.sql",
     };
 
     for (const auto& path : migrations) {
