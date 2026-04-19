@@ -5,6 +5,7 @@ import Login      from './pages/Login'
 import Register   from './pages/Register'
 import Onboarding from './pages/Onboarding'
 import Questions  from './pages/Questions'
+import Prompts    from './pages/Prompts'
 import Discover   from './pages/Discover'
 import Matches    from './pages/Matches'
 import Profile    from './pages/Profile'
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="/register"   element={<Register />} />
         <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
         <Route path="/questions"  element={<Protected><Questions /></Protected>} />
+        <Route path="/prompts"    element={<Protected><Prompts /></Protected>} />
         <Route path="/discover"   element={<Protected><Discover /></Protected>} />
         <Route path="/matches"    element={<Protected><Matches /></Protected>} />
         <Route path="/profile"    element={<Protected><Profile /></Protected>} />

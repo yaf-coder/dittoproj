@@ -34,6 +34,9 @@ export const api = {
   updateProfile:  (data) => request('PUT',  '/api/profiles/me', data),
   enrichProfile:  (data) => request('PUT',  '/api/profiles/me/enrich', data),
   getProfile:     (id)   => request('GET',  `/api/profiles/${id}`),
+  // Questions
+  randomQuestion: ()              => request('GET',  '/api/questions/random'),
+  answerQuestion: (id, answer)    => request('POST', '/api/questions/answer', { question_id: id, answer }),
   // Discover & matching
   discover:       ()     => request('GET',  '/api/discover'),
   like:           (id)   => request('POST', `/api/likes/${id}`),

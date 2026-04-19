@@ -14,6 +14,16 @@ const TABS = [
     ),
   },
   {
+    to: '/prompts',
+    label: 'Prompts',
+    icon: (active) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     to: '/matches',
     label: 'Matches',
     icon: (active) => (
@@ -37,7 +47,7 @@ const TABS = [
   },
 ]
 
-const TABBED_PATHS = ['/discover', '/matches', '/profile']
+const TABBED_PATHS = ['/discover', '/prompts', '/matches', '/profile']
 
 export default function NavBar() {
   const { pathname } = useLocation()
