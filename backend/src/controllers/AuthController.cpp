@@ -1,5 +1,6 @@
 #include "AuthController.h"
 #include "utils/JwtUtils.h"
+#include "utils/PasswordUtils.h"
 // #include "utils/OAuthUtils.h"   // Google OAuth — re-enable with routes below
 #include <drogon/drogon.h>
 #include <json/json.h>
@@ -28,34 +29,62 @@ void AuthController::login(const drogon::HttpRequestPtr& req,
     if (!body->isMember("password") || (*body)["password"].asString().empty())
                                                       { badRequest("password is required");   return; }
 
-    std::string phone = (*body)["phone_number"].asString();
+    std::string phone    = (*body)["phone_number"].asString();
+    std::string password = (*body)["password"].asString();
+    std::string pwHash   = PasswordUtils::hash(password);
 
     auto cb = shared_cb(std::move(callback));
     auto db = drogon::app().getDbClient();
 
-    // Find or create a user by phone number — password is not validated (fake auth).
+    // Look up existing user by phone number.
     db->execSqlAsync(
-        "INSERT INTO users (phone_number) VALUES (?)"
-        " ON CONFLICT(phone_number) DO UPDATE SET updated_at=unixepoch()"
-        " RETURNING id",
-        [cb](const drogon::orm::Result& r) {
+        "SELECT id, password_hash FROM users WHERE phone_number = ?",
+        [cb, db, phone, pwHash](const drogon::orm::Result& r) {
             if (r.empty()) {
-                Json::Value err;
-                err["error"] = "Database error";
-                auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
-                resp->setStatusCode(drogon::k500InternalServerError);
-                (*cb)(resp);
+                // New user — register with hashed password.
+                db->execSqlAsync(
+                    "INSERT INTO users (phone_number, password_hash) VALUES (?, ?) RETURNING id",
+                    [cb](const drogon::orm::Result& r2) {
+                        if (r2.empty()) {
+                            Json::Value err; err["error"] = "Database error";
+                            auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
+                            resp->setStatusCode(drogon::k500InternalServerError);
+                            (*cb)(resp); return;
+                        }
+                        Json::Value resp;
+                        resp["token"] = JwtUtils::createToken(r2[0]["id"].as<int64_t>());
+                        (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
+                    },
+                    [cb](const drogon::orm::DrogonDbException& e) {
+                        LOG_ERROR << "DB error registering user: " << e.base().what();
+                        Json::Value err; err["error"] = "Database error";
+                        auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
+                        resp->setStatusCode(drogon::k500InternalServerError);
+                        (*cb)(resp);
+                    },
+                    phone, pwHash
+                );
                 return;
             }
-            int64_t userId = r[0]["id"].as<int64_t>();
+
+            // Existing user — verify password.
+            auto storedHash = r[0]["password_hash"].isNull()
+                ? "" : r[0]["password_hash"].as<std::string>();
+
+            if (!PasswordUtils::verify(password, storedHash)) {
+                Json::Value err; err["error"] = "Invalid phone number or password";
+                auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
+                resp->setStatusCode(drogon::k401Unauthorized);
+                (*cb)(resp); return;
+            }
+
             Json::Value resp;
-            resp["token"] = JwtUtils::createToken(userId);
+            resp["token"] = JwtUtils::createToken(r[0]["id"].as<int64_t>());
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
         },
         [cb](const drogon::orm::DrogonDbException& e) {
             LOG_ERROR << "DB error in login: " << e.base().what();
-            Json::Value err;
-            err["error"] = "Database error";
+            Json::Value err; err["error"] = "Database error";
             auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
             resp->setStatusCode(drogon::k500InternalServerError);
             (*cb)(resp);

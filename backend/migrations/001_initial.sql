@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     age                INTEGER CHECK(age IS NULL OR (age >= 18 AND age <= 120)),
     location           TEXT,
     phone_number       TEXT    UNIQUE,
+    password_hash      TEXT,
 
     -- Projected by enrichment pipeline
     projected_gender   TEXT,
