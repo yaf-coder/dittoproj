@@ -33,8 +33,8 @@ export default function Register() {
         phone_number: form.phone_number.trim(),
         password:     form.password,
       })
-      login(token)
-      navigate('/onboarding', { replace: true })
+      await login(token)
+      navigate('/questions', { replace: true })
     } catch (e) {
       setError(e.message)
     } finally {

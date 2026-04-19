@@ -30,7 +30,7 @@ export default function Login() {
         phone_number: form.phone_number.trim(),
         password:     form.password,
       })
-      login(token)
+      await login(token)
       navigate('/questions', { replace: true })
     } catch (e) {
       setError(e.message)

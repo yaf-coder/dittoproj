@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback((token) => {
     localStorage.setItem('ditto_token', token)
-    loadUser()
+    return loadUser()
   }, [loadUser])
 
   const logout = useCallback(() => {

@@ -34,8 +34,8 @@ export default function App() {
     <div className="max-w-md mx-auto h-dvh flex flex-col relative overflow-hidden">
       <Routes>
         <Route path="/"           element={user ? <Navigate to="/discover" replace /> : <Landing />} />
-        <Route path="/login"      element={user ? <Navigate to="/discover" replace /> : <Login />} />
-        <Route path="/register"   element={user ? <Navigate to="/discover" replace /> : <Register />} />
+        <Route path="/login"      element={<Login />} />
+        <Route path="/register"   element={<Register />} />
         <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
         <Route path="/questions"  element={<Protected><Questions /></Protected>} />
         <Route path="/discover"   element={<Protected><Discover /></Protected>} />
