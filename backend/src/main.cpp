@@ -21,21 +21,28 @@ static void runMigrations(const std::string& dbPath) {
     sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
     sqlite3_exec(db, "PRAGMA foreign_keys=ON;",  nullptr, nullptr, nullptr);
 
-    std::ifstream file("migrations/001_initial.sql");
-    if (!file.is_open()) {
-        sqlite3_close(db);
-        throw std::runtime_error("Cannot open migrations/001_initial.sql");
-    }
-    std::ostringstream ss;
-    ss << file.rdbuf();
+    static const char* migrationFiles[] = {
+        "migrations/001_initial.sql",
+        "migrations/002_seed.sql",
+    };
 
-    char* errMsg = nullptr;
-    int rc = sqlite3_exec(db, ss.str().c_str(), nullptr, nullptr, &errMsg);
-    if (rc != SQLITE_OK) {
-        std::string err = errMsg ? errMsg : "unknown";
-        sqlite3_free(errMsg);
-        sqlite3_close(db);
-        throw std::runtime_error("Migration failed: " + err);
+    for (const char* path : migrationFiles) {
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            sqlite3_close(db);
+            throw std::runtime_error(std::string("Cannot open ") + path);
+        }
+        std::ostringstream ss;
+        ss << file.rdbuf();
+
+        char* errMsg = nullptr;
+        int rc = sqlite3_exec(db, ss.str().c_str(), nullptr, nullptr, &errMsg);
+        if (rc != SQLITE_OK) {
+            std::string err = errMsg ? errMsg : "unknown";
+            sqlite3_free(errMsg);
+            sqlite3_close(db);
+            throw std::runtime_error(std::string("Migration failed (") + path + "): " + err);
+        }
     }
 
     sqlite3_close(db);
