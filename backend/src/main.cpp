@@ -1,11 +1,24 @@
 #include <drogon/drogon.h>
 #include <sqlite3.h>
+#include <json/json.h>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include "utils/JwtUtils.h"
 #include "utils/NamSorUtils.h"
 // #include "utils/OAuthUtils.h"  // Google OAuth — uncomment to re-enable
+
+// Read config.json ourselves with jsoncpp as a reliable alternative to
+// Drogon's getCustomConfig(), which can behave differently across versions.
+static Json::Value loadCustomConfig() {
+    std::ifstream file("config.json");
+    if (!file.is_open()) throw std::runtime_error("Cannot open config.json");
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(file, root))
+        throw std::runtime_error("Failed to parse config.json");
+    return root["app"]["custom_config"];
+}
 
 // Run schema migrations against the SQLite file before Drogon opens its
 // own connection pool. Uses the raw C API so we can enable WAL mode and
@@ -53,7 +66,8 @@ int main() {
     // without starting the event loop, so it's safe to read config here.
     drogon::app().loadConfigFile("config.json");
 
-    const auto& cfg = drogon::app().getCustomConfig();
+    // Use our own parser — more reliable than getCustomConfig() across Drogon versions.
+    const Json::Value cfg = loadCustomConfig();
 
     JwtUtils::init(cfg["jwt_secret"].asString());
     NamSorUtils::init(cfg["namsor_api_key"].asString());
