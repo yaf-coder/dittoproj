@@ -3,3 +3,4 @@ frontend/dist/
 backend/build/
 backend/ditto.db
 .claude/
+frontend/package-lock.json
