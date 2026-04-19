@@ -12,10 +12,20 @@ const EDUCATION_LABELS = {
 }
 
 const GENDER_LABELS = {
-  male:             'Man',
-  female:           'Woman',
-  non_binary:       'Non-binary',
-  other:            'Other',
+  male:              'Man',
+  female:            'Woman',
+  non_binary:        'Non-binary',
+  other:             'Other',
+  prefer_not_to_say: 'Prefer not to say',
+}
+
+const ORIENTATION_LABELS = {
+  straight:          'Straight',
+  gay:               'Gay',
+  lesbian:           'Lesbian',
+  bisexual:          'Bisexual',
+  queer:             'Queer',
+  other:             'Other',
   prefer_not_to_say: 'Prefer not to say',
 }
 
@@ -73,7 +83,7 @@ export default function Profile() {
   if (!user) return null
 
   const hasEnrichment = user.gender || user.education_level ||
-    user.study_location || user.political_belief != null
+    user.study_location || user.sexual_orientation || user.political_belief != null
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
@@ -125,6 +135,7 @@ export default function Profile() {
           {hasEnrichment ? (
             <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
               <Row label="Gender"        value={GENDER_LABELS[user.gender]} />
+              <Row label="Orientation"   value={ORIENTATION_LABELS[user.sexual_orientation]} />
               <Row label="Education"     value={EDUCATION_LABELS[user.education_level]} />
               <Row label="Studied at"    value={user.study_location} />
               {user.political_belief != null && <BeliefBar score={user.political_belief} />}

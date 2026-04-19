@@ -124,6 +124,9 @@ void ProfileController::enrichProfile(const drogon::HttpRequestPtr& req,
     static const std::set<std::string> validEducation = {
         "high_school", "some_college", "bachelors", "masters", "phd"
     };
+    static const std::set<std::string> validOrientations = {
+        "straight", "gay", "lesbian", "bisexual", "queer", "other", "prefer_not_to_say"
+    };
 
     // All fields are optional. We collect everything as strings so we can
     // dispatch execSqlAsync with a simple switch on param count. SQLite's
@@ -160,6 +163,14 @@ void ProfileController::enrichProfile(const drogon::HttpRequestPtr& req,
         int v = (*body)["age"].asInt();
         if (v < 18 || v > 120) { badRequest("age must be between 18 and 120"); return; }
         addField("age", std::to_string(v));
+    }
+    if (body->isMember("sexual_orientation")) {
+        std::string v = (*body)["sexual_orientation"].asString();
+        if (validOrientations.find(v) == validOrientations.end()) {
+            badRequest("sexual_orientation must be one of: straight, gay, lesbian, bisexual, queer, other, prefer_not_to_say");
+            return;
+        }
+        addField("sexual_orientation", v);
     }
     if (body->isMember("political_belief")) {
         float v = (*body)["political_belief"].asFloat();
@@ -202,6 +213,7 @@ void ProfileController::enrichProfile(const drogon::HttpRequestPtr& req,
         case 5:  db->execSqlAsync(sql, rcb, ecb, p[0], p[1], p[2], p[3], p[4]); break;
         case 6:  db->execSqlAsync(sql, rcb, ecb, p[0], p[1], p[2], p[3], p[4], p[5]); break;
         case 7:  db->execSqlAsync(sql, rcb, ecb, p[0], p[1], p[2], p[3], p[4], p[5], p[6]); break;
+        case 8:  db->execSqlAsync(sql, rcb, ecb, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]); break;
         default: badRequest("Too many fields"); break;
     }
 }

@@ -22,6 +22,16 @@ const GENDER_OPTIONS = [
   { label: 'Prefer not to say', value: 'prefer_not_to_say' },
 ]
 
+const ORIENTATION_OPTIONS = [
+  { label: 'Straight',          value: 'straight' },
+  { label: 'Gay',               value: 'gay' },
+  { label: 'Lesbian',           value: 'lesbian' },
+  { label: 'Bisexual',          value: 'bisexual' },
+  { label: 'Queer',             value: 'queer' },
+  { label: 'Other',             value: 'other' },
+  { label: 'Prefer not to say', value: 'prefer_not_to_say' },
+]
+
 const POLITICAL_OPTIONS = [
   { label: 'Very Liberal',     value: 0.0 },
   { label: 'Liberal',          value: 0.25 },
@@ -80,11 +90,12 @@ export default function Questions() {
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
-    education_level:  user?.education_level  ?? null,
-    study_location:   user?.study_location   ?? '',
-    age:              user?.age              ?? '',
-    gender:           user?.gender           ?? null,
-    political_belief: user?.political_belief ?? null,
+    education_level:    user?.education_level    ?? null,
+    study_location:     user?.study_location     ?? '',
+    age:                user?.age                ?? '',
+    gender:             user?.gender             ?? null,
+    sexual_orientation: user?.sexual_orientation ?? null,
+    political_belief:   user?.political_belief   ?? null,
   })
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState('')
@@ -105,8 +116,9 @@ export default function Questions() {
         if (n < 18 || n > 120) { setError('Age must be between 18 and 120.'); setSaving(false); return }
         payload.age = n
       }
-      if (form.gender !== null)           payload.gender           = form.gender
-      if (form.political_belief !== null) payload.political_belief = form.political_belief
+      if (form.gender !== null)             payload.gender             = form.gender
+      if (form.sexual_orientation !== null) payload.sexual_orientation = form.sexual_orientation
+      if (form.political_belief !== null)   payload.political_belief   = form.political_belief
 
       if (Object.keys(payload).length > 0) {
         await api.enrichProfile(payload)
@@ -144,7 +156,7 @@ export default function Questions() {
 
       {/* Questions */}
       <div className="px-6 py-6 flex flex-col gap-8">
-        <Question number={1} total={5} title="What is your education level?">
+        <Question number={1} total={6} title="What is your education level?">
           <SelectPill
             options={EDUCATION_OPTIONS}
             selected={form.education_level}
@@ -152,7 +164,7 @@ export default function Questions() {
           />
         </Question>
 
-        <Question number={2} total={5} title="Where did you study?" subtitle="School, university, or program name.">
+        <Question number={2} total={6} title="Where did you study?" subtitle="School, university, or program name.">
           <Input
             placeholder="e.g. University of Texas"
             type="text"
@@ -161,7 +173,7 @@ export default function Questions() {
           />
         </Question>
 
-        <Question number={3} total={5} title="What is your age?">
+        <Question number={3} total={6} title="What is your age?">
           <Input
             placeholder="Age"
             type="number"
@@ -172,7 +184,7 @@ export default function Questions() {
           />
         </Question>
 
-        <Question number={4} total={5} title="What is your gender identity?">
+        <Question number={4} total={6} title="What is your gender identity?">
           <SelectPill
             options={GENDER_OPTIONS}
             selected={form.gender}
@@ -180,7 +192,15 @@ export default function Questions() {
           />
         </Question>
 
-        <Question number={5} total={5} title="What is your political identity?">
+        <Question number={5} total={6} title="What is your sexual orientation?">
+          <SelectPill
+            options={ORIENTATION_OPTIONS}
+            selected={form.sexual_orientation}
+            onSelect={v => set('sexual_orientation', v)}
+          />
+        </Question>
+
+        <Question number={6} total={6} title="What is your political identity?">
           <SelectPill
             options={POLITICAL_OPTIONS}
             selected={form.political_belief}

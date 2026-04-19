@@ -14,8 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
     gender           TEXT,   -- "male" | "female" | "non_binary" | "other" | "prefer_not_to_say"
     ethnicity        TEXT,   -- "white" | "black" | "hispanic" | "asian" | "native_american" | "pacific_islander" | "middle_eastern" | "other" | "prefer_not_to_say"
     education_level  TEXT,   -- "high_school" | "some_college" | "bachelors" | "masters" | "phd"
-    study_location   TEXT,   -- free text, e.g. "MIT" or "University of Texas"
-    political_belief REAL,   -- 0.0 = very liberal, 1.0 = very conservative
+    study_location      TEXT,   -- free text, e.g. "MIT" or "University of Texas"
+    sexual_orientation  TEXT,   -- "straight" | "gay" | "lesbian" | "bisexual" | "queer" | "other" | "prefer_not_to_say"
+    political_belief    REAL,   -- 0.0 = very liberal, 1.0 = very conservative
 
     -- Profile photo (user-uploaded)
     picture        TEXT,
