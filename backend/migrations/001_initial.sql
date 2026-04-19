@@ -1,6 +1,6 @@
 -- Fields explicitly collected from the user: name, age, location, phone_number.
--- All other attributes (gender, ethnicity, education, political belief) are projected
--- by the enrichment pipeline and never asked of the user.
+-- Enrichment fields (gender, ethnicity, education_level, political_belief) are
+-- optional and user-supplied via the "Enrich Your Profile" form.
 
 CREATE TABLE IF NOT EXISTS users (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,15 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
     location           TEXT,                          -- free-text city/region, e.g. "Austin, TX"
     phone_number       TEXT,
 
-    -- Projected by enrichment pipeline (never user-supplied)
-    projected_gender   TEXT,                          -- "male" | "female" | "unknown"
-    projected_ethnicity TEXT,                         -- NamSor raceEthnicity code, e.g. "W_NL", "HL", "A", "B_NL"
+    -- Optional enrichment fields (user-supplied via profile form)
+    gender             TEXT,                          -- "male" | "female" | "non_binary" | "prefer_not_to_say"
+    ethnicity          TEXT,                          -- "white" | "black" | "hispanic" | "asian" | "native_american" | "pacific_islander" | "middle_eastern" | "other" | "prefer_not_to_say"
     education_level    TEXT,                          -- "high_school" | "some_college" | "bachelors" | "masters" | "phd"
-    political_belief   REAL,                          -- 0.0 = far left, 1.0 = far right (formula TBD)
-
-    -- Enrichment lifecycle
-    enrichment_status  TEXT    NOT NULL DEFAULT 'pending',  -- "pending" | "done" | "failed"
-    enriched_at        INTEGER,
+    political_belief   REAL,                          -- 0.0 = very liberal, 1.0 = very conservative
 
     -- OAuth picture (from Google, display only)
     picture            TEXT,
