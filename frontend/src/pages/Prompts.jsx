@@ -64,8 +64,8 @@ export default function Prompts() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="px-6 pt-14 pb-4 safe-top shrink-0">
-        <h1 className="text-[28px] font-bold tracking-tight2 text-apple-text">Prompts</h1>
+      <div className="px-6 pt-5 pb-4 shrink-0">
+        <h1 className="text-lg font-cursive text-apple-text">Prompts</h1>
         <p className="text-[15px] text-apple-sub mt-0.5">Answer honestly. Skip freely.</p>
       </div>
 

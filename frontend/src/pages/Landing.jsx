@@ -12,7 +12,7 @@ export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <div className="h-dvh flex flex-col bg-white">
+    <div className="h-dvh flex flex-col bg-apple-gray">
       {/* Hero */}
       <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
         <motion.div {...fadeUp(0)} className="mb-8">
@@ -22,24 +22,24 @@ export default function Landing() {
                 d="M20 8C14 8 9 13 9 19c0 4 2.5 7.5 6 9.5L20 32l5-3.5c3.5-2 6-5.5 6-9.5 0-6-5-11-11-11z"
                 fill="white"
               />
-              <circle cx="16" cy="19" r="2.5" fill="#007AFF" />
-              <circle cx="24" cy="19" r="2.5" fill="#007AFF" />
+              <circle cx="16" cy="19" r="2.5" fill="#2D4A6A" />
+              <circle cx="24" cy="19" r="2.5" fill="#2D4A6A" />
             </svg>
           </div>
         </motion.div>
 
         <motion.h1
           {...fadeUp(0.1)}
-          className="text-[52px] font-bold tracking-tight2 text-apple-text leading-none mb-3"
+          className="text-[58px] font-cursive text-apple-blue leading-none mb-3"
         >
-          Ditto
+          Concordia
         </motion.h1>
 
-        <motion.p {...fadeUp(0.2)} className="text-[22px] font-medium text-apple-sub mb-4">
-          Find your match.
+        <motion.p {...fadeUp(0.2)} className="text-[18px] font-medium text-apple-sub mb-4">
+          Built on alignment, not attraction.
         </motion.p>
 
-        <motion.p {...fadeUp(0.3)} className="text-[17px] text-apple-sub/80 max-w-xs leading-relaxed">
+        <motion.p {...fadeUp(0.3)} className="text-[15px] text-apple-sub/80 max-w-xs leading-relaxed">
           Connect with people who truly align with who you are.
         </motion.p>
       </div>

@@ -43,6 +43,7 @@ static void runMigrations(const std::string& dbPath) {
         "migrations/001_initial.sql",
         "migrations/005_user_responses.sql",
         "migrations/006_compatibility_scores.sql",
+        "migrations/007_passes.sql",
     };
 
     for (const auto& path : migrations) {
