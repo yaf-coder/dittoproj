@@ -5,6 +5,7 @@ import Button from '../components/Button'
 
 export default function Prompts() {
   const [question, setQuestion]   = useState(null)
+  const [done, setDone]           = useState(false)
   const [answer, setAnswer]       = useState('')
   const [loading, setLoading]     = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -18,7 +19,13 @@ export default function Prompts() {
     setError('')
     try {
       const q = await api.randomQuestion()
-      setQuestion(q)
+      if (q.done) {
+        setDone(true)
+        setQuestion(null)
+      } else {
+        setDone(false)
+        setQuestion(q)
+      }
     } catch (e) {
       setError(e.message)
     } finally {
@@ -73,6 +80,24 @@ export default function Prompts() {
               className="flex-1 flex items-center justify-center"
             >
               <div className="w-8 h-8 border-[3px] border-apple-blue border-t-transparent rounded-full animate-spin" />
+            </motion.div>
+          ) : done ? (
+            <motion.div
+              key="done"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col items-center justify-center gap-3 pt-16"
+            >
+              <div className="w-20 h-20 rounded-full bg-apple-gray flex items-center justify-center">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17l-5-5" stroke="#34C759" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <p className="font-semibold text-[18px] text-apple-text">You're all caught up</p>
+              <p className="text-apple-sub text-[14px] text-center px-8">
+                No more questions for now. Come back later!
+              </p>
             </motion.div>
           ) : question ? (
             <motion.div

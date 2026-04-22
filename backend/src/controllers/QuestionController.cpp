@@ -45,15 +45,19 @@ void QuestionController::getRandom(const drogon::HttpRequestPtr& req,
             for (const auto& row : r)
                 answered.push_back(row["question_id"].as<int>());
 
-            // Build pool of unanswered questions; fall back to full list if all answered.
+            // Build pool of unanswered questions.
             std::vector<const Question*> pool;
             for (const auto& q : QUESTIONS) {
                 if (std::find(answered.begin(), answered.end(), q.id) == answered.end())
                     pool.push_back(&q);
             }
+
+            // All questions answered — tell the client there's nothing left.
             if (pool.empty()) {
-                for (const auto& q : QUESTIONS)
-                    pool.push_back(&q);
+                Json::Value resp;
+                resp["done"] = true;
+                (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
+                return;
             }
 
             // Pick a random question from the pool.
@@ -63,6 +67,7 @@ void QuestionController::getRandom(const drogon::HttpRequestPtr& req,
             const Question* q = pool[dist(rng)];
 
             Json::Value resp;
+            resp["done"] = false;
             resp["id"]   = q->id;
             resp["text"] = q->text;
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));

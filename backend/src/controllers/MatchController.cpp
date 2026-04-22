@@ -28,10 +28,9 @@ void MatchController::discover(const drogon::HttpRequestPtr& req,
 
     // Return profiles the user hasn't liked yet, excluding incomplete profiles.
     db->execSqlAsync(
-        "SELECT u.id, u.name, u.picture, u.bio, u.age, u.gender"
+        "SELECT u.id, u.name, u.picture, u.age, u.gender"
         " FROM users u"
         " WHERE u.id != ?"
-        "   AND u.age IS NOT NULL"
         "   AND u.id NOT IN (SELECT liked_id FROM likes WHERE liker_id = ?)"
         " ORDER BY RANDOM() LIMIT 10",
         [cb](const drogon::orm::Result& r) {
@@ -41,8 +40,7 @@ void MatchController::discover(const drogon::HttpRequestPtr& req,
                 p["id"]      = row["id"].as<int64_t>();
                 p["name"]    = row["name"].as<std::string>();
                 p["picture"] = row["picture"].isNull() ? "" : row["picture"].as<std::string>();
-                p["bio"]     = row["bio"].isNull()     ? "" : row["bio"].as<std::string>();
-                p["age"]     = row["age"].as<int>();
+                if (!row["age"].isNull()) p["age"] = row["age"].as<int>();
                 if (!row["gender"].isNull()) p["gender"] = row["gender"].as<std::string>();
                 profiles.append(p);
             }
@@ -105,6 +103,71 @@ void MatchController::likeUser(const drogon::HttpRequestPtr& req,
         },
         [cb](const drogon::orm::DrogonDbException& e) { dbError(e, "likeUser/insert", cb); },
         userId, likedId
+    );
+}
+
+void MatchController::getCandidates(const drogon::HttpRequestPtr& req,
+                                     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+    auto userId = req->attributes()->get<int64_t>("userId");
+    auto cb     = shared_cb(std::move(callback));
+    auto db     = drogon::app().getDbClient();
+
+    db->execSqlAsync(
+        "SELECT u.id, u.name, u.picture, u.age, u.gender,"
+        "       COALESCE(cs.score, -1) AS compat_score"
+        " FROM users u"
+        " LEFT JOIN compatibility_scores cs ON cs.user_id = ? AND cs.match_id = u.id"
+        " WHERE u.id != ?"
+        "   AND u.id NOT IN (SELECT liked_id  FROM likes  WHERE liker_id  = ?)"
+        "   AND u.id NOT IN (SELECT passed_id FROM passes WHERE passer_id = ?)"
+        " ORDER BY compat_score DESC, RANDOM()"
+        " LIMIT 20",
+        [cb](const drogon::orm::Result& r) {
+            Json::Value candidates(Json::arrayValue);
+            for (const auto& row : r) {
+                Json::Value c;
+                c["id"]      = row["id"].as<int64_t>();
+                c["name"]    = row["name"].as<std::string>();
+                c["picture"] = row["picture"].isNull() ? "" : row["picture"].as<std::string>();
+                if (!row["age"].isNull())    c["age"]    = row["age"].as<int>();
+                if (!row["gender"].isNull()) c["gender"] = row["gender"].as<std::string>();
+                double score = row["compat_score"].as<double>();
+                if (score >= 0.0) c["compatibility"] = score;
+                candidates.append(c);
+            }
+            (*cb)(drogon::HttpResponse::newHttpJsonResponse(candidates));
+        },
+        [cb](const drogon::orm::DrogonDbException& e) { dbError(e, "getCandidates", cb); },
+        userId, userId, userId, userId
+    );
+}
+
+void MatchController::passUser(const drogon::HttpRequestPtr& req,
+                                std::function<void(const drogon::HttpResponsePtr&)>&& callback,
+                                int64_t passedId) {
+    auto userId = req->attributes()->get<int64_t>("userId");
+
+    if (userId == passedId) {
+        Json::Value err;
+        err["error"] = "Cannot pass yourself";
+        auto resp = drogon::HttpResponse::newHttpJsonResponse(err);
+        resp->setStatusCode(drogon::k400BadRequest);
+        callback(resp);
+        return;
+    }
+
+    auto cb = shared_cb(std::move(callback));
+    auto db = drogon::app().getDbClient();
+
+    db->execSqlAsync(
+        "INSERT OR IGNORE INTO passes (passer_id, passed_id) VALUES (?, ?)",
+        [cb](const drogon::orm::Result&) {
+            Json::Value resp;
+            resp["success"] = true;
+            (*cb)(drogon::HttpResponse::newHttpJsonResponse(resp));
+        },
+        [cb](const drogon::orm::DrogonDbException& e) { dbError(e, "passUser", cb); },
+        userId, passedId
     );
 }
 
