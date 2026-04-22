@@ -12,8 +12,8 @@ export default function Discover() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const profiles = await api.discover()
-      setStack(profiles)
+      const profiles = await api.getCandidates()
+      setStack([...profiles].reverse())
     } finally {
       setLoading(false)
     }

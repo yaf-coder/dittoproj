@@ -40,5 +40,9 @@ export const api = {
   // Discover & matching
   discover:       ()     => request('GET',  '/api/discover'),
   like:           (id)   => request('POST', `/api/likes/${id}`),
+  pass:           (id)   => request('POST', `/api/passes/${id}`),
+  getCandidates:  ()     => request('GET',  '/api/candidates'),
   getMatches:     ()     => request('GET',  '/api/matches'),
+  // Photo
+  updatePhoto:    (url)  => request('PUT',  '/api/profiles/me/photo', { url }),
 }
