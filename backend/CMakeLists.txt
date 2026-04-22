@@ -14,8 +14,10 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
     GIT_TAG        v0.7.0
 )
-set(JWT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(JWT_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(JWT_BUILD_EXAMPLES       OFF CACHE BOOL "" FORCE)
+set(JWT_BUILD_TESTS          OFF CACHE BOOL "" FORCE)
+# Tell jwt-cpp to use the system nlohmann_json rather than fetching its own.
+set(JWT_EXTERNAL_PICOJSON    OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(jwt-cpp)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
@@ -31,4 +33,5 @@ target_link_libraries(ditto_backend PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
     jwt-cpp::jwt-cpp
+    sqlite3
 )
