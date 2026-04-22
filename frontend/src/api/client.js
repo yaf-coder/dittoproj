@@ -45,4 +45,6 @@ export const api = {
   getMatches:     ()     => request('GET',  '/api/matches'),
   // Photo
   updatePhoto:    (url)  => request('PUT',  '/api/profiles/me/photo', { url }),
+  // Prompts
+  getPrompt:      ()     => request('GET',  '/api/profiles/me/prompt'),
 }

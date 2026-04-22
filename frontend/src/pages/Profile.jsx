@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/AuthContext'
 import Button from '../components/Button'
+import { api } from '../api/client'
 
 const EDUCATION_LABELS = {
   high_school:  'High School',
@@ -12,20 +14,10 @@ const EDUCATION_LABELS = {
 }
 
 const GENDER_LABELS = {
-  male:              'Man',
-  female:            'Woman',
-  non_binary:        'Non-binary',
-  other:             'Other',
-  prefer_not_to_say: 'Prefer not to say',
-}
-
-const ORIENTATION_LABELS = {
-  straight:          'Straight',
-  gay:               'Gay',
-  lesbian:           'Lesbian',
-  bisexual:          'Bisexual',
-  queer:             'Queer',
-  other:             'Other',
+  male:             'Man',
+  female:           'Woman',
+  non_binary:       'Non-binary',
+  other:            'Other',
   prefer_not_to_say: 'Prefer not to say',
 }
 
@@ -78,16 +70,32 @@ function BeliefBar({ score }) {
 }
 
 export default function Profile() {
-  const { user, logout } = useAuth()
+  const { user, logout, loadUser } = useAuth()
   const navigate = useNavigate()
+  const [photoUrl, setPhotoUrl]   = useState('')
+  const [photoSaving, setPhotoSaving] = useState(false)
+  const [photoFlash, setPhotoFlash]   = useState(false)
   if (!user) return null
 
+  async function handlePhotoSave() {
+    if (!photoUrl.trim()) return
+    setPhotoSaving(true)
+    try {
+      await api.updatePhoto(photoUrl.trim())
+      await loadUser()
+      setPhotoUrl('')
+      setPhotoFlash(true)
+      setTimeout(() => setPhotoFlash(false), 2000)
+    } catch {}
+    setPhotoSaving(false)
+  }
+
   const hasEnrichment = user.gender || user.education_level ||
-    user.study_location || user.sexual_orientation || user.political_belief != null
+    user.study_location || user.political_belief != null
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
-      <div className="safe-top" />
+      <div className="pt-5" />
 
       {/* Header */}
       <div className="px-6 pt-10 pb-6 flex flex-col items-center text-center">
@@ -100,7 +108,7 @@ export default function Profile() {
             </div>
           )}
         </div>
-        <h1 className="text-[24px] font-bold tracking-tight2 text-apple-text">{user.name}</h1>
+        <h1 className="text-[24px] font-cursive text-apple-text">{user.name}</h1>
         {user.location && (
           <p className="text-apple-sub text-[15px] mt-0.5 flex items-center gap-1">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -112,6 +120,27 @@ export default function Profile() {
       </div>
 
       <div className="px-4 pb-10 flex flex-col gap-4">
+        {/* Photo URL */}
+        <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-4 flex flex-col gap-3">
+          <p className="text-[13px] font-semibold text-apple-sub uppercase tracking-wide">Photo</p>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              placeholder="Paste a photo URL…"
+              value={photoUrl}
+              onChange={e => setPhotoUrl(e.target.value)}
+              className="flex-1 text-[15px] border border-apple-gray-2 rounded-xl px-3 py-2 outline-none focus:border-apple-blue"
+            />
+            <button
+              onClick={handlePhotoSave}
+              disabled={photoSaving || !photoUrl.trim()}
+              className="px-4 py-2 rounded-xl bg-apple-blue text-white text-[14px] font-medium disabled:opacity-40"
+            >
+              {photoFlash ? 'Saved ✓' : 'Save'}
+            </button>
+          </div>
+        </div>
+
         {/* Basic info */}
         <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
           <Row label="Age"          value={user.age} />
@@ -135,7 +164,6 @@ export default function Profile() {
           {hasEnrichment ? (
             <div className="bg-white rounded-3xl shadow-apple-sm px-5 py-1">
               <Row label="Gender"        value={GENDER_LABELS[user.gender]} />
-              <Row label="Orientation"   value={ORIENTATION_LABELS[user.sexual_orientation]} />
               <Row label="Education"     value={EDUCATION_LABELS[user.education_level]} />
               <Row label="Studied at"    value={user.study_location} />
               {user.political_belief != null && <BeliefBar score={user.political_belief} />}

@@ -57,8 +57,8 @@ export default function Login() {
         <Input
           name="phone_number"
           label="Phone number"
-          placeholder="+1 (555) 000-0000"
-          type="tel"
+          placeholder="Phone number"
+          type="text"
           autoComplete="tel"
           value={form.phone_number}
           onChange={handleChange}
