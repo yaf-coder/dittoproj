@@ -9,7 +9,7 @@
   }
 
   body {
-    @apply bg-white text-apple-text font-sans;
+    @apply bg-apple-gray text-apple-text font-sans;
     overscroll-behavior: none;
   }
 
@@ -35,6 +35,6 @@
     padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
   .safe-top {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: max(env(safe-area-inset-top, 0px), 2rem);
   }
 }

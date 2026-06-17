@@ -5,14 +5,17 @@ export default {
     extend: {
       colors: {
         apple: {
-          blue:      '#007AFF',
-          'blue-dk': '#0071E3',
-          gray:      '#F5F5F7',
-          'gray-2':  '#E8E8ED',
-          text:      '#1D1D1F',
-          sub:       '#6E6E73',
-          red:       '#FF3B30',
-          green:     '#34C759',
+          blue:      '#2D4A6A',
+          'blue-dk': '#1E3550',
+          gray:      '#ECEEF4',
+          'gray-2':  '#DDE0EA',
+          text:      '#2A2A2E',
+          sub:       '#8D8FA8',
+          red:       '#C0392B',
+          green:     '#2E7D52',
+          leather:   '#9A6040',
+          dust:      '#E8D5C8',
+          emperor:   '#4B4B4B',
         },
       },
       fontFamily: {
@@ -20,6 +23,7 @@ export default {
           '-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"',
           '"SF Pro Text"', '"Helvetica Neue"', 'Arial', 'sans-serif',
         ],
+        cursive: ['"Playfair Display"', 'serif'],
       },
       borderRadius: {
         '4xl': '2rem',

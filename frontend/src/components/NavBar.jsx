@@ -65,14 +65,14 @@ export default function NavBar() {
               className="flex-1 flex flex-col items-center gap-0.5 py-2.5"
             >
               <motion.span
-                animate={{ color: active ? '#007AFF' : '#6E6E73' }}
+                animate={{ color: active ? '#2D4A6A' : '#8D8FA8' }}
                 transition={{ duration: 0.15 }}
               >
                 {icon(active)}
               </motion.span>
               <motion.span
-                animate={{ color: active ? '#007AFF' : '#6E6E73' }}
-                className="text-[10px] font-medium"
+                animate={{ color: active ? '#2D4A6A' : '#8D8FA8' }}
+                className="text-[10px] font-cursive"
                 transition={{ duration: 0.15 }}
               >
                 {label}

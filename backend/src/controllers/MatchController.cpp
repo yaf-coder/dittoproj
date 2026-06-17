@@ -112,16 +112,17 @@ void MatchController::getCandidates(const drogon::HttpRequestPtr& req,
     auto cb     = shared_cb(std::move(callback));
     auto db     = drogon::app().getDbClient();
 
+    // Return all potential candidates. Users with compatibility scores come first
+    // (top 3 by the agent), then everyone else in stable id order.
     db->execSqlAsync(
-        "SELECT u.id, u.name, u.picture, u.age, u.gender,"
-        "       COALESCE(cs.score, -1) AS compat_score"
+        "SELECT u.id, u.name, u.picture, u.age, u.gender, cs.score AS compat_score"
         " FROM users u"
-        " LEFT JOIN compatibility_scores cs ON cs.user_id = ? AND cs.match_id = u.id"
+        " LEFT JOIN compatibility_scores cs"
+        "   ON cs.user_id = ? AND cs.match_id = u.id"
         " WHERE u.id != ?"
         "   AND u.id NOT IN (SELECT liked_id  FROM likes  WHERE liker_id  = ?)"
         "   AND u.id NOT IN (SELECT passed_id FROM passes WHERE passer_id = ?)"
-        " ORDER BY compat_score DESC, RANDOM()"
-        " LIMIT 20",
+        " ORDER BY (cs.score IS NULL), cs.score DESC, u.id ASC",
         [cb](const drogon::orm::Result& r) {
             Json::Value candidates(Json::arrayValue);
             for (const auto& row : r) {
@@ -131,8 +132,9 @@ void MatchController::getCandidates(const drogon::HttpRequestPtr& req,
                 c["picture"] = row["picture"].isNull() ? "" : row["picture"].as<std::string>();
                 if (!row["age"].isNull())    c["age"]    = row["age"].as<int>();
                 if (!row["gender"].isNull()) c["gender"] = row["gender"].as<std::string>();
-                double score = row["compat_score"].as<double>();
-                if (score >= 0.0) c["compatibility"] = score;
+                if (!row["compat_score"].isNull()) {
+                    c["compatibility"] = row["compat_score"].as<double>();
+                }
                 candidates.append(c);
             }
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(candidates));
@@ -179,7 +181,7 @@ void MatchController::getMatches(const drogon::HttpRequestPtr& req,
 
     db->execSqlAsync(
         "SELECT m.id AS match_id, m.created_at,"
-        "       u.id AS user_id, u.name, u.picture, u.bio"
+        "       u.id AS user_id, u.name, u.picture, u.age"
         " FROM matches m"
         " JOIN users u ON u.id = CASE WHEN m.user1_id = ? THEN m.user2_id ELSE m.user1_id END"
         " WHERE m.user1_id = ? OR m.user2_id = ?"
@@ -193,7 +195,7 @@ void MatchController::getMatches(const drogon::HttpRequestPtr& req,
                 m["user"]["id"]      = row["user_id"].as<int64_t>();
                 m["user"]["name"]    = row["name"].as<std::string>();
                 m["user"]["picture"] = row["picture"].isNull() ? "" : row["picture"].as<std::string>();
-                m["user"]["bio"]     = row["bio"].isNull()     ? "" : row["bio"].as<std::string>();
+                if (!row["age"].isNull()) m["user"]["age"] = row["age"].as<int>();
                 matches.append(m);
             }
             (*cb)(drogon::HttpResponse::newHttpJsonResponse(matches));
